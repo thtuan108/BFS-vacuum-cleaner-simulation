@@ -5,7 +5,7 @@ Room::Room(int x, int y)
 	width = x;
 	length = y;
 
-	initializeGrid(); // khoi tao ma tran ngau nhien
+	initializeGrid(); // randomly initialize a matrix
 }
 
 int Room::getWidth()
@@ -20,7 +20,6 @@ int Room::getLength()
 
 void Room::initializeGrid() {
 	
-	// Tao ma tran ngau nhien
 	floor = new int*[width];
 	
 	srand(time(NULL));
@@ -30,15 +29,14 @@ void Room::initializeGrid() {
 
 		for (int j = 0; j < length; j++)
 		{
-			floor[i][j] = rand() % 10; // khoi tao cac o co gia tri [0, 9]
+			floor[i][j] = rand() % 10; // assign value in range [0, 9] to the elements
 		}
 	}
 }
 
 bool Room::initializeRoom(Robot& robot)
 {
-	// Tao cac vat can dang khoi
-	// => thay cac o xung quanh 9 thanh 10 de tao cac chuong ngai vat dang khoi
+	// create the obstacle in the room
 	for (int i = 0; i < width; i++)
 	{
 		for (int j = 0; j < length; j++)
@@ -86,11 +84,11 @@ bool Room::initializeRoom(Robot& robot)
 		}
 	}
 	
-	// dat robot vao ma tran, neu khong duoc thi phan hoi lai
+	// put the Robot into the matrix, then return the outcome
 	if (!robot.getInRoom(*this))
 	{
-		cout << "\n\tRobot khong the hut bui do phong qua nhieu do dac";
-		cout << "\n\tVui long don dep lai phong de robot co the hut bui";
+		cout << "\n\tCleaning cannot be started, there are to many furniture in the room";
+		cout << "\n\tPlease tidy up the room first";
 		return false;
 	}
 	else return true;
@@ -98,24 +96,24 @@ bool Room::initializeRoom(Robot& robot)
 
 void Room::describe()
 {
-	printf("\n\t Giai thich cac ki hieu:");
+	printf("\n\t Symbols definition:");
 	printf("\n\t _____");
-	printf("\n\t|_____| : Da hut bui xong");
+	printf("\n\t|_____| : Cleaned position");
 	printf("\n\t _____");
-	printf("\n\t|__0__| : Chua duoc hut bui");
+	printf("\n\t|__0__| : Uncleaned position");
 	printf("\n\t _____");
-	printf("\n\t|/////| : Chuong ngai vat");
+	printf("\n\t|/////| : Obstable");
 	printf("\n\t _____    _____    _____    _____");
-	printf("\n\t|__^__|, |__v__|, |_>>>_|, |_<<<_| : Vi tri robot hien hanh");
+	printf("\n\t|__^__|, |__v__|, |_>>>_|, |_<<<_| : Robot position");
 
 	cout << "\n\n";
 }
 
 int Room::showFloor()
 {
-	int done = 1; // danh dau neu cong viec hoan tat => done == 1, nguoc lai done == 0
+	int done = 1; // if cleaning is done => done == 1, else done == 0
 	
-	// Ve vach ngan o tren cung
+	// Create the top wall
 	cout << "\n\t";
 	for (int j = 0; j < length; j++)
 	{
@@ -123,7 +121,7 @@ int Room::showFloor()
 	}
 	cout << endl;
 	
-	// Ve so do phong dua tren gia tri cac o trong ma tran	
+	// Create the room chart, based on the values in the matrix	
 	for (int i = 0; i < width; i++)
 	{
 		cout << "\t";
@@ -131,43 +129,43 @@ int Room::showFloor()
 		{
 			if (j == 0)
 			{
-				printf("|"); // Dung vach ngan ben trai ma tran
+				printf("|"); // Create the left wall
 			}
 
-			if (floor[i][j] < 0) // la vi tri cua robot
+			if (floor[i][j] < 0) // if Robot is in this position
 			{
-				if (floor[i][j] == -1)		// huong Bac
+				if (floor[i][j] == -1)		// North
 				{
 					printf("__^__|");
 				}
-				else if (floor[i][j] == -2)	// huong Dong
+				else if (floor[i][j] == -2)	// East
 				{
 					printf("_>>>_|");
 				}
-				else if (floor[i][j] == -3)	// huong Tay
+				else if (floor[i][j] == -3)	// West
 				{
 					printf("_<<<_|");
 				}
-				else						// huong Nam
+				else						// South
 				{
 					printf("__v__|");
 				}
 			}
-			else // khong phai vi tri cua robot
+			else // if Robot is not in this position
 			{
-				if (floor[i][j] == 11)		// da di qua
+				if (floor[i][j] == 11)		// cleaned
 				{
 					printf("_____|");
 				}
-				else if (floor[i][j] == 10)	// chuong ngai vat
+				else if (floor[i][j] == 10)	// obstacle
 				{
 					printf("/////|");
 				}
-				else						// 0 -> 9 la o chua hut bui
+				else						// 0 -> 9 => uncleaned
 				{
 					printf("__0__|");
 
-					// Cong viec chua hoan tat => done = 0
+					// Cleaning is not done yet => done = 0
 					done = 0;
 				}
 			}
@@ -176,7 +174,7 @@ int Room::showFloor()
 		cout << endl;
 	}
 
-	return done; // phan hoi trang thai cong viec da hoan tat hay chua
+	return done; // return the progress of the job
 }
 
 int Room::valueAt(int i, int j)

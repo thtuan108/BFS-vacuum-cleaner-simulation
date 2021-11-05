@@ -15,23 +15,23 @@ enum Direction
 class Robot {
 
 private:
-	// Toa do vi tri cua robot trong phong:
-	int x;	// toa do theo chieu rong
-	int y;	// toa do theo chieu dai
-	Direction direction;	// huong di chuyen hien tai
-	int step;				// danh dau so buoc ma robot da di
+	// Coordination of Robot in the room
+	int x;	// row number
+	int y;	// column number
+	Direction direction;	// current direction
+	int step;				// number of steps Robot has made
 
-	string brand;		// Nhan hieu robot
-	string productCode;	// Ma so san pham
+	string brand;
+	string productCode;
 
-	int toNorth(Room&);		// ve huong Bac, tra ve 1 neu da don dep xong
-	int toEast(Room&);		// ve huong Dong, tra ve 1 neu da don dep xong
-	int toWest(Room&);		// ve huong Tay, tra ve 1 neu da don dep xong
-	int toSouth(Room&);		// ve huong Nam, tra ve 1 neu da don dep xong
+	int toNorth(Room&);		// to the North, return 1 if cleaning is done
+	int toEast(Room&);		// to the East, return 1 if cleaning is done
+	int toWest(Room&);		// to the West, return 1 if cleaning is done
+	int toSouth(Room&);		// to the South, return 1 if cleaning is done
 
-	int batteryWarning();			// bao pin yeu duoi 15% va tuy chon sac pin
-	vector<int> findRoute(Room&);	// tim duong den o chua duoc don dep gan nhat
-	int move(Room&, vector<int>);	// di chuyen theo lo trinh duoc cung cap
+	int batteryWarning();			// check battery and ask for options
+	vector<int> findRoute(Room&);	// find best route to nearest uncleaned position
+	int move(Room&, vector<int>);	// move using the route given
 
 public:
 	Robot();
@@ -39,8 +39,8 @@ public:
 	int getX();
 	int getY();
 
-	void showInfor();		// hien thi thong tin cua robot
-	bool getInRoom(Room&);	// dat robot vao phong (ma tran), huong Bac, tra ve "true" neu thanh cong
+	void showInfor();		// display Robot's information
+	bool getInRoom(Room&);	// put Robot into the room, head to the North, return 1 if succeed
 
 	void run(Room&);
 };

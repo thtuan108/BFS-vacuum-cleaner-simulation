@@ -21,37 +21,36 @@ int Robot::getY()
 void Robot::showInfor()
 {
 	cout << "\n\t_______________________________________";
-	cout << setfill(' ') << setw(40) << left << "\n\t| ROBOT HUT BUI WALL-E";
+	cout << setfill(' ') << setw(40) << left << "\n\t| VACUUM CLEANER ROBOT WALL-E";
 	cout << "|";
 	cout << "\n\t|_____________________________________|";
-	cout << "\n\t| Nhan hieu: " << setfill(' ') << setw(25) << left << brand;
+	cout << "\n\t| Brand: " << setfill(' ') << setw(29) << left << brand;
 	cout << "|";
 	cout << "\n\t|_____________________________________|";
-	cout << "\n\t| Ma so san pham: " << setfill(' ') << setw(20) << left <<  productCode;
+	cout << "\n\t| Product code: " << setfill(' ') << setw(22) << left <<  productCode;
 	cout << "|";
 	cout << "\n\t|_____________________________________|";
 	cout << setprecision(1) << fixed;
-	cout << "\n\n\tMuc pin hien tai: " << 100 - (double)step / 1 << "%";
+	cout << "\n\n\tBattery: " << 100 - (double)step / 1 << "%";
 	if (step >= 85)
 	{
-		cout << "\n\t\t___________________";
-		if (step < 100) cout << "\n\t\t| !!! PIN YEU !!! |";
-		else cout << "\n\t\t| !!! HET PIN !!! |";
-		cout << "\n\t\t|_________________|";
+		cout << "\n\t\t__________________________";
+		if (step < 100) cout << "\n\t\t|  !!! LOW BATTERY !!!   |";
+		else cout << "\n\t\t| !!! OUT OF BATTERY !!! |";
+		cout << "\n\t\t|________________________|";
 	}
 }
 
 bool Robot::getInRoom(Room& room)
 {
-	// dat robot o vi tri trung tam, huong ve phia Bac
+	// put Robot in the center of the room, head to the North
 	direction = NORTH;
 	step = 0;
 	x = room.getWidth() / 2;
 	y = room.getLength() / 2;
 
-	// neu robot roi vao o co chuong ngai vat thi nhay sang o khac (random)
-	// dung bien countRand de dem so lan random roi vao o chuong ngai vat
-	// neu countRand > 100 thi duyet lai tu dau den cuoi ma tran
+	// if Robot is put at position that has obstable, put it to another position randomly
+	// countRand is used to count the number of times Robot is put at ostacled position
 	int countRand = 0;
 	srand(time(NULL));
 	while (room.valueAt(x, y) == 10 && countRand <= 100)
@@ -62,7 +61,7 @@ bool Robot::getInRoom(Room& room)
 		countRand++;
 	}
 
-	// neu robot van roi vao o chuong ngai vat => duyet ma tran tu dau den cuoi
+	// if countRand > 100 then check the matrix from front to rear to find free position
 	if (room.valueAt(x, y) == 10)
 	{
 		for (int i = 0; i < room.getWidth(); i++)
@@ -78,17 +77,17 @@ bool Robot::getInRoom(Room& room)
 		}
 	}
 
-	// neu khong the tim duoc vi tri cho robot tren ma tra, tra ve "false"
+	// if there is no free position for Robot, then return "false"
 	if (room.valueAt(x, y) == 10) return false;
 	
-	//nguoc lai, tra ve "true"
-	room.setValue(-1, x, y); // danh dau vi tri robot tren ma tran
+	// else, store the position of Robot in the matrix and return "true"
+	room.setValue(-1, x, y);
 	return true;
 }
 
 int Robot::toNorth(Room& room) 
 {
-	room.setValue(11, x, y); // danh dau o hien tai la da di qua
+	room.setValue(11, x, y); // mark the current position cleaned
 
 	x--;
 	room.setValue(-1, x, y);
@@ -99,13 +98,13 @@ int Robot::toNorth(Room& room)
 	system("cls");
 	showInfor();
 	
-	if (room.showFloor() == 1) return 1; // da hoan tat don dep
+	if (room.showFloor() == 1) return 1; // finish cleaning, return 1
 	else
 	{
-		int batteryOut = batteryWarning();	// kiem tra pin
-		if (batteryOut == 2)	// cho robot nghi ngoi
+		int batteryOut = batteryWarning();	// check the battery
+		if (batteryOut == 2)	// give robot a rest
 			return 2;
-		else	// tiep tuc don dep
+		else	// continue to clean
 		{
 			if (batteryOut == 0) room.describe();
 			return 0;
@@ -115,7 +114,7 @@ int Robot::toNorth(Room& room)
 
 int Robot::toEast(Room& room) 
 {
-	room.setValue(11, x, y); // danh dau o hien tai la da di qua
+	room.setValue(11, x, y); // mark the current position cleaned
 
 	y++;
 	room.setValue(-2, x, y);
@@ -125,13 +124,13 @@ int Robot::toEast(Room& room)
 	Sleep(200);
 	system("cls");
 	showInfor();
-	if (room.showFloor() == 1) return 1; // da hoan tat don dep
+	if (room.showFloor() == 1) return 1; // finish cleaning, return 1
 	else
 	{
-		int batteryOut = batteryWarning();	// kiem tra pin
-		if (batteryOut == 2)	// cho robot nghi ngoi
+		int batteryOut = batteryWarning();	// check the battery
+		if (batteryOut == 2)	// give robot a rest
 			return 2;
-		else	// tiep tuc don dep
+		else	// continue to clean
 		{
 			if (batteryOut == 0)room.describe();
 			return 0;
@@ -141,7 +140,7 @@ int Robot::toEast(Room& room)
 
 int Robot::toWest(Room& room) 
 {
-	room.setValue(11, x, y); // danh dau o hien tai la da di qua
+	room.setValue(11, x, y); // mark the current position cleaned
 
 	y--;
 	room.setValue(-3, x, y);
@@ -151,13 +150,13 @@ int Robot::toWest(Room& room)
 	Sleep(200);
 	system("cls");
 	showInfor();
-	if (room.showFloor() == 1) return 1; // da hoan tat don dep
+	if (room.showFloor() == 1) return 1; // finish cleaning, return 1
 	else
 	{
-		int batteryOut = batteryWarning();	// kiem tra pin
-		if (batteryOut == 2)	// cho robot nghi ngoi
+		int batteryOut = batteryWarning();	// check the battery
+		if (batteryOut == 2)	// give robot a rest
 			return 2;
-		else	// tiep tuc don dep
+		else	// continue to clean
 		{
 			if (batteryOut == 0)room.describe();
 			return 0;
@@ -167,7 +166,7 @@ int Robot::toWest(Room& room)
 
 int Robot::toSouth(Room& room) 
 {
-	room.setValue(11, x, y); // danh dau o hien tai la da di qua
+	room.setValue(11, x, y); // mark the current position cleaned
 
 	x++;
 	room.setValue(-4, x, y);
@@ -177,13 +176,13 @@ int Robot::toSouth(Room& room)
 	Sleep(200);
 	system("cls");
 	showInfor();
-	if (room.showFloor() == 1) return 1; // da hoan tat don dep
+	if (room.showFloor() == 1) return 1; // finish cleaning, return 1
 	else
 	{
-		int batteryOut = batteryWarning();	// kiem tra pin
-		if (batteryOut == 2)	// cho robot nghi ngoi
+		int batteryOut = batteryWarning();	// check the battery
+		if (batteryOut == 2)	// give robot a rest
 			return 2;
-		else	// tiep tuc don dep
+		else	// continue to clean
 		{
 			if (batteryOut == 0)room.describe();
 			return 0;
@@ -196,25 +195,25 @@ int Robot::batteryWarning()
 	if (step == 100)
 	{
 		cout << "\n\t\t************************************************************";
-		cout << "\n\t\t\t!!! HET PIN !!! MOI QUY KHACH LUA CHON TINH NANG:";
-		cout << "\n\t\t\t 1. Sac pin va tiep tuc don dep";
-		cout << "\n\t\t\t 2. Cho robot nghi ngoi";
-		cout << "\n\t\t\t => Lua chon cua quy khach: ";
+		cout << "\n\t\t\t!!! OUT OF BATTERY !!! PLEASE CHOOSE ONE OF THE OPTIONS BELOW:";
+		cout << "\n\t\t\t 1. Charge and continue to work";
+		cout << "\n\t\t\t 2. Give Robot a rest";
+		cout << "\n\t\t\t => Your choice: ";
 		int option;
 		cin >> option;
 
 		while (option != 1 && option != 2)
 		{
-			cout << "\n\t\t=> Lua chon khong hop le, moi chon lai: ";
+			cout << "\n\t\t=> This choice is invalid, please choose again: ";
 			cin >> option;
 		}
 
 		if (option == 1)
 		{
 			step = 0;
-			cout << "\t\t\t__________________________";
-			cout << "\n\t\t\t| ... ROBOT DANG SAC ... |";
-			cout << "\n\t\t\t|________________________|\n\n";
+			cout << "\t\t\t_____________________________";
+			cout << "\n\t\t\t| ... ROBOT IS CHARGING ... |";
+			cout << "\n\t\t\t|___________________________|\n\n";
 			Sleep(1000);
 		}
 		return option;
@@ -222,6 +221,7 @@ int Robot::batteryWarning()
 	return 0;
 }
 
+// find route to the nearest uncleaned square using BFS
 vector<int> Robot::findRoute(Room& room)
 {
 	int** trace = new int* [room.getWidth()];
@@ -235,7 +235,7 @@ vector<int> Robot::findRoute(Room& room)
 
 	int xDirect[4] = { 0,1,-1,0 };
 	int yDirect[4] = { -1,0,0,1 };
-	// cac phan tu tai vi tri 0, 1, 2, 3 tuong ung Tay, Nam, Bac, Dong
+	// elements at index 0, 1, 2, 3 represent West, South, North, East repectively
 
 	queue<pair<int, int>> q;
 	q.push(make_pair(x, y));
@@ -317,22 +317,22 @@ void Robot::run(Room& room)
 		int output = move(room, route);
 		if (output == 1)
 		{
-			cout << "\t\t___________________________________________________________";
-			cout << "\n\t\t| DA DON DEP XONG! CAM ON QUY KHACH DA TIN TUONG SU DUNG! |";
-			cout << "\n\t\t|_________________________________________________________|\n\n";
+			cout << "\t\t___________________________________________________";
+			cout << "\n\t\t| FINISHED CLEANING! THANKS FOR USING OUT SERVICE |";
+			cout << "\n\t\t|_________________________________________________|\n\n";
 			return;
 		}
 		else if (output == 2)
 		{
-			cout << "\t\t_______________________________________________";
-			cout << "\n\t\t| CAM ON QUY KHACH! ROBOT SE SOM PHUC VU LAI! |";
-			cout << "\n\t\t|_____________________________________________|\n\n";
+			cout << "\t\t______________________________________";
+			cout << "\n\t\t| THANK YOU! ROBOT WILL BE BACK SOON |";
+			cout << "\n\t\t|____________________________________|\n\n";
 			return;
 		}
 
 		route = findRoute(room);
 	}
-	cout << "\t\t_______________________________________________________";
-	cout << "\n\t\t| PHONG QUA NHIEU DO DAC! KHONG THE HOAN TAT DON DEP! |";
-	cout << "\n\t\t|_____________________________________________________|\n\n";
+	cout << "\t\t___________________________________________________________";
+	cout << "\n\t\t| TOO MANY FURNITURE IN THE ROOM! CLEANING CANNOT BE DONE |";
+	cout << "\n\t\t|_________________________________________________________|\n\n";
 }

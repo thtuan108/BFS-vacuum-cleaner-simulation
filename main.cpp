@@ -9,10 +9,10 @@ int main()
 	robot.showInfor();
 
 	int width, length;
-	cout << "\n\n\tNhap thong tin cua phong can don: ";
-	cout << "\n\tChieu rong: ";
+	cout << "\n\n\tEnter the room's information: ";
+	cout << "\n\tWidth: ";
 	cin >> width;
-	cout << "\tChieu dai: ";
+	cout << "\tLength: ";
 	cin >> length;
 
 	Room room(width, length);
